@@ -1,0 +1,280 @@
+/* ===========================================================================
+   Resume Forge — default template styles
+   Two-column print-first resume. All color/spacing via CSS custom properties
+   so renderer.ts (Story 2.5) can inject themes by overriding :root tokens.
+   =========================================================================== */
+
+:root {
+  /* Accent / brand */
+  --accent-color: #E8952A;
+  --accent-dark:  #C4771A;
+
+  /* Text */
+  --text-primary:   #1A1A1A;
+  --text-secondary: #555555;
+  --text-italic:    #444444;
+
+  /* Background */
+  --bg-primary: #FFFFFF;
+  --divider:    #E0E0E0;
+
+  /* Layout */
+  --col-left:    27%;
+  --col-right:   73%;
+  --page-margin: 0.75in;
+
+  /* Spacing scale */
+  --space-xs: 4px;    /* bullet indent, icon-text gap */
+  --space-sm: 8px;    /* within-entry spacing */
+  --space-md: 14px;   /* between sections */
+  --space-lg: 20px;   /* column gap, header margin */
+  --space-xl: 28px;   /* header block bottom margin */
+
+  /* Font — rem baseline. 1rem = 10px so font sizes map to clean values. */
+  font-size: 10px;
+}
+
+/* Compact mode — tighter spacing for content-dense resumes. */
+.compact {
+  --space-xs: 2px;
+  --space-sm: 4px;
+  --space-md: 8px;
+  --space-lg: 12px;
+  --space-xl: 16px;
+}
+
+/* ── Base ─────────────────────────────────────────────────────────────────── */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', 'Calibri', 'Segoe UI', system-ui, sans-serif;
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+  margin: 0;
+  padding: var(--page-margin);
+}
+
+/* ── Page layout (CSS grid, two columns + full-width header) ───────────────── */
+
+.resume {
+  display: grid;
+  grid-template-columns: var(--col-left) var(--col-right);
+  grid-template-rows: auto 1fr;
+  gap: var(--space-lg);
+  max-width: 8.5in;
+  margin: 0 auto;
+}
+
+.r-header { grid-column: 1 / -1; }
+.r-left   { grid-column: 1; }
+.r-right  { grid-column: 2; }
+
+/* ── Resume header ────────────────────────────────────────────────────────── */
+
+.r-header {
+  position: relative;
+  margin-bottom: var(--space-xl);
+  padding-top: var(--space-md);
+  page-break-after: avoid;
+}
+
+.r-header-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 120px;
+  height: 8px;
+  background-color: var(--accent-color);
+}
+
+.r-name {
+  font-size: 2.8rem;   /* 28px */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.1;
+}
+
+.r-subtitle {
+  font-size: 1.3rem;   /* 13px */
+  font-weight: 400;
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: var(--space-xs) 0 0 0;
+}
+
+/* ── Section headers ("+ SECTION NAME") ───────────────────────────────────── */
+
+.r-sh {
+  font-size: 1.1rem;   /* 11px */
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-primary);
+  margin-top: var(--space-md);
+  margin-bottom: var(--space-sm);
+  letter-spacing: 0.05em;
+}
+
+.r-sh::before {
+  content: '+ ';
+  color: var(--accent-color);
+}
+
+/* ── Experience entries ───────────────────────────────────────────────────── */
+
+.r-job {
+  margin-bottom: var(--space-md);
+  page-break-inside: avoid;
+}
+
+.r-jtitle {
+  font-size: 1.1rem;   /* 11px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.r-jmeta {
+  font-size: 1.0rem;   /* 10px */
+  font-style: italic;
+  color: var(--text-italic);
+  margin-top: 1px;
+}
+
+.r-jdesc {
+  font-size: 1.0rem;   /* 10px */
+  font-weight: 400;
+  color: var(--text-primary);
+  margin: var(--space-xs) 0;
+}
+
+.r-jbullets {
+  list-style: none;
+  margin: var(--space-xs) 0 0 0;
+  padding: 0;
+}
+
+.r-jbullets li {
+  font-size: 1.0rem;   /* 10px */
+  color: var(--text-primary);
+  list-style: none;
+  padding-left: 1em;
+  position: relative;
+  margin-bottom: 1px;
+}
+
+.r-jbullets li::before {
+  content: '●';
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  font-size: 0.6rem;   /* ~6px filled circle */
+  color: var(--text-primary);
+}
+
+/* ── Contact block (icon squares) ─────────────────────────────────────────── */
+
+.r-ci {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-xs);
+}
+
+.r-icon {
+  width: 14px;
+  height: 14px;
+  background-color: var(--accent-color);
+  color: #FFFFFF;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-right: var(--space-xs);
+}
+
+.r-ci span {
+  font-size: 1.0rem;   /* 10px */
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Skill / achievement lists (● bullets) ────────────────────────────────── */
+
+.r-skills,
+.r-achiev {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.r-skills li,
+.r-achiev li {
+  list-style: none;
+  padding-left: 1em;
+  position: relative;
+  font-size: 1.0rem;   /* 10px */
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.r-skills li::before,
+.r-achiev li::before {
+  content: '●';
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  font-size: 0.6rem;   /* ~6px filled circle */
+  color: var(--text-primary);
+}
+
+/* Proficiency category labels and items (optional richer skills) */
+.r-skill-cat {
+  font-size: 1.0rem;   /* 10px */
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-top: var(--space-xs);
+}
+
+.r-skill-item {
+  font-size: 0.95rem;  /* 9.5px */
+  font-weight: 400;
+  color: var(--text-secondary);
+}
+
+/* Right-column body paragraphs (summary) */
+.r-right p {
+  font-size: 1.0rem;   /* 10px */
+  color: var(--text-primary);
+  margin: var(--space-xs) 0;
+  line-height: 1.4;
+}
+
+/* ── Print media query ────────────────────────────────────────────────────── */
+
+@media print {
+  @page {
+    size: letter;
+    margin: 0.75in;
+  }
+
+  body {
+    padding: 0;
+  }
+
+  .resume {
+    width: 100%;
+    max-width: none;
+  }
+
+  * {
+    -webkit-print-color-adjust: exact;
+    color-adjust: exact;
+  }
+
+  .no-print {
+    display: none;
+  }
+}

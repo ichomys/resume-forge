@@ -1,0 +1,84 @@
+# generated: 2026-05-29
+# last_updated: 2026-05-29  # stories 2-1..2-6 ready-for-dev; epic-2 in-progress
+# 1-2 story file created 2026-05-29
+# project: Resume Forge
+# project_key: NOKEY
+# tracking_system: file-system
+# story_location: project Outline
+
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+#
+# Epic Status Transitions:
+#   - backlog → in-progress: Automatically when first story is created (via create-story)
+#   - in-progress → done: Manually when all stories reach 'done' status
+#
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created in stories folder
+#   - in-progress: Developer actively working on implementation
+#   - review: Ready for code review (via Dev's code-review workflow)
+#   - done: Story completed
+#
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+#
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when first story is created
+# - Stories can be worked in parallel if team capacity allows
+# - SM typically creates next story after previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+
+generated: 2026-05-29
+last_updated: 2026-05-30  # Epic 1 stories 1-2..1-7 and Epic 4 stories 4-1..4-4 reviewed and moved to done
+project: Resume Forge
+# 1-1 reviewed & moved to done on 2026-05-29 (code review)
+project_key: NOKEY
+tracking_system: file-system
+story_location: project Outline
+
+development_status:
+  # ── Epic 1: Tool Foundation & Initialization ──────────────────────────────
+  epic-1: in-progress
+  1-1-project-scaffolding-and-build-toolchain: done
+  1-2-html-resume-template: done
+  1-3-cli-display-module: done
+  1-4-configuration-module: done
+  1-5-init-wizard: done
+  1-6-config-command: done
+  1-7-profile-loading-and-experience-indexing: done
+  epic-1-retrospective: optional
+
+  # ── Epic 2: Core Generation Pipeline ─────────────────────────────────────
+  epic-2: in-progress
+  2-1-job-description-capture: done
+  2-2-llm-adapter-layer: done
+  2-3-alignment-analysis-and-report: done
+  2-4-resume-content-generation: done
+  2-5-html-rendering-and-theme-injection: done
+  2-6-hitl-review-and-file-output: done
+  epic-2-retrospective: optional
+
+  # ── Epic 3: Gap Discovery & Honest Fit Assessment ─────────────────────────
+  epic-3: done
+  3-1-answer-store-persistence: done
+  3-2-gap-identification-and-question-generation: done
+  3-3-multi-round-context-collection: done
+  3-4-alignment-recalculation-after-context: done
+  3-5-honest-fit-assessment-and-graceful-exit: done
+  3-6-role-title-as-generation-target: done
+  epic-3-retrospective: optional
+
+  # ── Epic 4: Answer Store — Compounding Knowledge Base ────────────────────
+  epic-4: in-progress
+  4-1-answer-store-pre-fill-on-return-runs: done
+  4-2-answer-store-management: done
+  4-3-profile-update-without-data-loss: done
+  4-4-run-history-log: done
+  epic-4-retrospective: optional

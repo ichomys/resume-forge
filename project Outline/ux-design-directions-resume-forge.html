@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Resume Forge — Design Direction Showcase</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Inter', system-ui, sans-serif; background: #111; color: #eee; }
+
+    .showcase-header {
+      background: #1a1a1a;
+      border-bottom: 1px solid #333;
+      padding: 24px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .showcase-header h1 { font-size: 18px; font-weight: 700; color: #fff; }
+    .showcase-header p { font-size: 12px; color: #888; margin-top: 4px; }
+    .direction-nav { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+    .direction-nav a {
+      font-size: 11px; padding: 5px 12px; border-radius: 4px;
+      border: 1px solid #333; color: #aaa; text-decoration: none; transition: all 0.15s;
+    }
+    .direction-nav a:hover { border-color: #E8952A; color: #E8952A; }
+
+    .direction-section { padding: 48px 40px; border-bottom: 1px solid #222; }
+
+    .direction-label h2 { font-size: 20px; font-weight: 700; color: #fff; }
+    .direction-label p { font-size: 13px; color: #888; margin-top: 10px; max-width: 640px; line-height: 1.6; }
+    .direction-label .chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .chip {
+      font-size: 10px; padding: 3px 10px; background: #222;
+      border: 1px solid #333; border-radius: 20px; color: #aaa;
+    }
+
+    .resume-wrapper { background: #1e1e1e; border-radius: 8px; padding: 32px; margin-top: 24px; overflow-x: auto; }
+
+    /* Scale resume to fit */
+    .resume-viewport { width: 612px; height: 792px; overflow: hidden; }
+    .resume-scale { transform-origin: top left; transform: scale(0.75); width: 816px; }
+
+    /* ── RESUME BASE ─────────────────────────────── */
+    .resume {
+      width: 816px;
+      min-height: 1056px;
+      background: #fff;
+      font-family: 'Inter', 'Calibri', system-ui, sans-serif;
+    }
+
+    .r-header { padding: 26px 32px 16px 32px; position: relative; overflow: hidden; }
+
+    .r-header-accent {
+      position: absolute; top: 0; left: 0;
+      width: 54px; height: 70px;
+      background: var(--accent);
+      clip-path: polygon(0 0, 100% 0, 68% 100%, 0 100%);
+    }
+
+    .r-name {
+      font-size: 28px; font-weight: 700;
+      color: var(--text); line-height: 1.1; margin-left: 62px;
+    }
+    .r-subtitle {
+      font-size: 13px; color: var(--muted);
+      font-weight: 400; margin-left: 62px; margin-top: 4px;
+    }
+    .r-divider { border: none; border-top: 1.5px solid var(--line); margin: 14px 32px 0; }
+
+    .r-body {
+      display: grid;
+      grid-template-columns: var(--left-w) 1fr;
+      column-gap: 20px;
+      padding: 14px 32px 32px;
+    }
+
+    .r-sh {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      color: var(--text); margin-top: var(--gap); margin-bottom: 7px;
+      display: flex; align-items: baseline; gap: 4px;
+    }
+    .r-sh::before { content: '+'; color: var(--accent); font-size: 12px; }
+
+    .r-p { font-size: 9.5px; color: var(--text); line-height: 1.5; }
+
+    .r-skills { list-style: none; margin-top: 3px; }
+    .r-skills li {
+      font-size: 9.5px; color: var(--text); padding: 2.5px 0;
+      display: flex; align-items: flex-start; gap: 6px;
+    }
+    .r-skills li::before {
+      content: '●'; color: var(--text); font-size: 6.5px; margin-top: 2px; flex-shrink: 0;
+    }
+
+    .r-contact { margin-top: 2px; }
+    .r-ci {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 9.5px; font-weight: 600; color: var(--text); margin: 4px 0;
+    }
+    .r-icon {
+      width: 14px; height: 14px; background: var(--accent); border-radius: 2px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; color: #fff; font-weight: 700; flex-shrink: 0;
+    }
+
+    .r-achiev { list-style: none; }
+    .r-achiev li {
+      font-size: 9.5px; color: var(--text); padding: 2px 0 2px 13px;
+      position: relative; line-height: 1.45; margin-bottom: 4px;
+    }
+    .r-achiev li::before {
+      content: '●'; position: absolute; left: 0; top: 4px;
+      font-size: 6px; color: var(--text);
+    }
+
+    .r-job { margin-bottom: 13px; }
+    .r-jtitle { font-size: 11px; font-weight: 700; color: var(--text); line-height: 1.3; }
+    .r-jtitle .sep { color: var(--muted); font-weight: 400; margin: 0 2px; }
+    .r-jmeta { font-size: 9.5px; color: var(--italic); font-style: italic; margin-top: 2px; }
+    .r-jdesc { font-size: 9.5px; color: var(--text); line-height: 1.5; margin-top: 4px; }
+    .r-jbullets { list-style: none; margin-top: 4px; }
+    .r-jbullets li {
+      font-size: 9.5px; color: var(--text); padding: 2px 0 2px 13px;
+      position: relative; line-height: 1.45;
+    }
+    .r-jbullets li::before {
+      content: '●'; position: absolute; left: 0; top: 3px; font-size: 6px; color: var(--text);
+    }
+
+    /* ── THEMES ─────────────────────────────────── */
+    .t-amber  { --accent:#E8952A; --text:#1A1A1A; --muted:#555; --italic:#444; --line:#E0E0E0; --left-w:27%; --gap:14px; }
+    .t-slate  { --accent:#3B5F8A; --text:#1A1A1A; --muted:#555; --italic:#444; --line:#E0E0E0; --left-w:27%; --gap:14px; }
+    .t-forest { --accent:#2E6B47; --text:#1A1A1A; --muted:#555; --italic:#444; --line:#E0E0E0; --left-w:27%; --gap:14px; }
+    .t-char   { --accent:#3D3D3D; --text:#1A1A1A; --muted:#666; --italic:#444; --line:#CCC;    --left-w:27%; --gap:14px; }
+    .t-compact{ --accent:#E8952A; --text:#1A1A1A; --muted:#555; --italic:#444; --line:#E0E0E0; --left-w:27%; --gap:10px; }
+    .t-compact .r-p,
+    .t-compact .r-skills li,
+    .t-compact .r-achiev li,
+    .t-compact .r-jtitle,
+    .t-compact .r-jdesc,
+    .t-compact .r-jbullets li,
+    .t-compact .r-jmeta { font-size: 9px; }
+    .t-compact .r-job { margin-bottom: 10px; }
+
+    /* Direction F — Bold header */
+    .t-bold-header { --accent:#E8952A; --text:#1A1A1A; --muted:#555; --italic:#444; --line:#E0E0E0; --left-w:27%; --gap:14px; }
+    .t-bold-header .r-header { padding: 0; }
+    .t-bold-header .r-header-band { background: var(--accent); padding: 20px 32px 16px; }
+    .t-bold-header .r-name { color:#fff; margin-left:0; }
+    .t-bold-header .r-subtitle { color:rgba(255,255,255,0.88); margin-left:0; font-size:12px; }
+    .t-bold-header .r-header-accent { display:none; }
+    .t-bold-header .r-divider { display:none; }
+    .t-bold-header .r-body { padding-top:16px; }
+  </style>
+</head>
+<body>
+
+<div class="showcase-header">
+  <h1>Resume Forge — Design Direction Showcase</h1>
+  <p>6 resume template directions · Open in Chrome for best rendering · Scroll or jump to a direction</p>
+  <nav class="direction-nav">
+    <a href="#dir-a">A — Amber Reference</a>
+    <a href="#dir-b">B — Slate Professional</a>
+    <a href="#dir-c">C — Forest Trust</a>
+    <a href="#dir-d">D — Charcoal Minimal</a>
+    <a href="#dir-e">E — Amber Compact</a>
+    <a href="#dir-f">F — Bold Header</a>
+  </nav>
+</div>
+
+<!-- SHARED CONTENT MACRO via JS template -->
+<script>
+const EXP = [
+  {
+    title: "Salesforce Consultant", co: "Links Technologies",
+    meta: "Chicago, IL (Remote) | February 2023 – Present",
+    desc: "Worked primarily with Builder's Vision to support a growing team and Salesforce adoption.",
+    bullets: [
+      "Separated and migrated Salesforce instances to support growth of internal companies",
+      "Facilitated process documentation to support scaling and post-deployment understanding",
+      "Developed agentic coding framework for BV; deployed reliable tools via AntiGravity & Claude"
+    ]
+  },
+  {
+    title: "Senior Salesforce Administrator", co: "Pushpay Inc",
+    meta: "Redmond, WA (Remote) | August 2021 – August 2022",
+    desc: "Joined a large, established team as a Senior Administrator to apply Salesforce skills more directly.",
+    bullets: [
+      "Facilitated Deployment meetings ensuring changes would not impact other Salesforce-dependent teams",
+      "Translated extensive Workflow Rules & Process Builders to Flow ahead of feature deprecation"
+    ]
+  },
+  {
+    title: "Business Systems Analyst & Salesforce Administrator", co: "HeadLight, Inc.",
+    meta: "Seattle, WA | 2017 – April 2021",
+    desc: "Promoted to focus exclusively on system optimization to drive organizational improvements.",
+    bullets: [
+      "Briefed executive team on analysis findings; gained acceptance to implement 100% of recommended solutions",
+      "Re-engineered Salesforce workflows for a sales team that tripled in size in under 12 months"
+    ]
+  }
+];
+
+const ACHIEV = [
+  "Successfully planned and executed a Salesforce migration for 120+ users, including data separation and 2 unique instances from scratch in 3 months.",
+  "Transformed HeadLight from startup-level systems to a fully integrated toolset driving organizational efficiency and growth.",
+  "Built out Salesforce instance resulting in a simplified sales pipeline, actionable CX data for renewals, and accurate revenue visualization for finance."
+];
+
+const SKILLS = [
+  "Salesforce Administration","Workflow Development","Integration Implementation",
+  "Troubleshooting & Diagnostics","SaaS Deployments","Network Management",
+  "Process Documentation","Support Team Training","Asset Management"
+];
+
+function buildResume(theme, boldHeader) {
+  const headerInner = boldHeader
+    ? `<div class="r-header-band"><div class="r-name">Joshua D. Rainboldt</div><div class="r-subtitle">Business Systems Analyst &nbsp;|&nbsp; Salesforce Administrator &nbsp;|&nbsp; Technical Support</div></div>`
+    : `<div class="r-header-accent"></div><div class="r-name">Joshua D. Rainboldt</div><div class="r-subtitle">Business Systems Analyst &nbsp;|&nbsp; Salesforce Administrator &nbsp;|&nbsp; Technical Support</div><hr class="r-divider">`;
+
+  const leftCol = `
+    <div class="r-sh">Summary</div>
+    <p class="r-p">Seasoned systems administrator dedicated to devising and implementing high-quality solutions. Five years' experience supporting C-suite executives, sales professionals, and development teams in an agile environment.</p>
+    <div class="r-sh">Core Skills</div>
+    <ul class="r-skills">${SKILLS.map(s=>`<li>${s}</li>`).join('')}</ul>
+    <div class="r-sh">Contact</div>
+    <div class="r-contact">
+      <div class="r-ci"><span class="r-icon">☎</span>1.562.619.4361</div>
+      <div class="r-ci"><span class="r-icon">✉</span>joshrainboldt@gmail.com</div>
+      <div class="r-ci"><span class="r-icon">in</span>/in/joshrainboldt</div>
+    </div>
+  `;
+
+  const rightCol = `
+    <div class="r-sh">Achievements</div>
+    <ul class="r-achiev">${ACHIEV.map(a=>`<li>${a}</li>`).join('')}</ul>
+    <div class="r-sh">Experience</div>
+    ${EXP.map(e=>`
+      <div class="r-job">
+        <div class="r-jtitle">${e.title}<span class="sep"> | </span>${e.co}</div>
+        <div class="r-jmeta">${e.meta}</div>
+        <p class="r-jdesc">${e.desc}</p>
+        <ul class="r-jbullets">${e.bullets.map(b=>`<li>${b}</li>`).join('')}</ul>
+      </div>
+    `).join('')}
+  `;
+
+  return `
+    <div class="resume ${theme}">
+      <div class="r-header">${headerInner}</div>
+      <div class="r-body">
+        <div>${leftCol}</div>
+        <div>${rightCol}</div>
+      </div>
+    </div>`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.querySelectorAll('[data-theme]').forEach(el => {
+    const bold = el.dataset.bold === 'true';
+    el.innerHTML = buildResume(el.dataset.theme, bold);
+  });
+});
+</script>
+
+<!-- ── DIRECTION A ─────────────────────────────── -->
+<div class="direction-section" id="dir-a">
+  <div class="direction-label">
+    <h2>A — Amber Reference Modified</h2>
+    <div class="chips">
+      <span class="chip">Accent: Amber #E8952A</span>
+      <span class="chip">Columns: 27% / 73%</span>
+      <span class="chip">Spacing: Standard</span>
+      <span class="chip">Header: Geometric accent shape</span>
+    </div>
+    <p>Faithful to your reference design with the column ratio narrowed. Left sidebar is lean — just enough for contact, skills, and section labels. Right column maximizes space for achievements and experience. This is the default.</p>
+  </div>
+  <div class="resume-wrapper">
+    <div class="resume-viewport">
+      <div class="resume-scale">
+        <div data-theme="t-amber"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIRECTION B ─────────────────────────────── -->
+<div class="direction-section" id="dir-b">
+  <div class="direction-label">
+    <h2>B — Slate Professional</h2>
+    <div class="chips">
+      <span class="chip">Accent: Slate Blue #3B5F8A</span>
+      <span class="chip">Columns: 27% / 73%</span>
+      <span class="chip">Spacing: Standard</span>
+      <span class="chip">Layout: Identical to A</span>
+    </div>
+    <p>Same layout as Direction A with the slate-blue color scheme. Reads more corporate and technical — well suited for engineering, enterprise, financial, or government roles where calm professionalism is the signal.</p>
+  </div>
+  <div class="resume-wrapper">
+    <div class="resume-viewport">
+      <div class="resume-scale">
+        <div data-theme="t-slate"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIRECTION C ─────────────────────────────── -->
+<div class="direction-section" id="dir-c">
+  <div class="direction-label">
+    <h2>C — Forest Trust</h2>
+    <div class="chips">
+      <span class="chip">Accent: Forest Green #2E6B47</span>
+      <span class="chip">Columns: 27% / 73%</span>
+      <span class="chip">Spacing: Standard</span>
+      <span class="chip">Layout: Identical to A</span>
+    </div>
+    <p>Forest green accent — grounded, trustworthy. Reads well for roles in sustainability, operations, civic tech, or any context where reliability matters more than energy. A distinct alternative that doesn't shout.</p>
+  </div>
+  <div class="resume-wrapper">
+    <div class="resume-viewport">
+      <div class="resume-scale">
+        <div data-theme="t-forest"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIRECTION D ─────────────────────────────── -->
+<div class="direction-section" id="dir-d">
+  <div class="direction-label">
+    <h2>D — Charcoal Minimal</h2>
+    <div class="chips">
+      <span class="chip">Accent: Charcoal #3D3D3D</span>
+      <span class="chip">Columns: 27% / 73%</span>
+      <span class="chip">Spacing: Standard</span>
+      <span class="chip">Effect: All-neutral palette</span>
+    </div>
+    <p>No color accent — pure black/gray. Maximum professionalism, zero visual distraction. Ideal for conservative industries (legal, finance, government) or any context where the work should be the only thing that stands out.</p>
+  </div>
+  <div class="resume-wrapper">
+    <div class="resume-viewport">
+      <div class="resume-scale">
+        <div data-theme="t-char"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIRECTION E ─────────────────────────────── -->
+<div class="direction-section" id="dir-e">
+  <div class="direction-label">
+    <h2>E — Amber Compact</h2>
+    <div class="chips">
+      <span class="chip">Accent: Amber #E8952A</span>
+      <span class="chip">Columns: 27% / 73%</span>
+      <span class="chip">Spacing: Tight (10px section gap)</span>
+      <span class="chip">Font: 9px body</span>
+    </div>
+    <p>Same amber design with reduced spacing and slightly smaller type. Fits more content per page — useful for roles requiring a longer experience section or when generated content is dense. Good "overflow" option for content-heavy runs.</p>
+  </div>
+  <div class="resume-wrapper">
+    <div class="resume-viewport">
+      <div class="resume-scale">
+        <div data-theme="t-compact"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── DIRECTION F ─────────────────────────────── -->
+<div class="direction-section" id="dir-f">
+  <div class="direction-label">
+    <h2>F — Amber Bold Header</h2>
+    <div class="chips">
+      <span class="chip">Accent: Amber #E8952A</span>
+      <span class="chip">Columns: 27% / 73%</span>
+      <span class="chip">Header: Full-width amber band</span>
+      <span class="chip">Name: White on amber</span>
+    </div>
+    <p>Full-width amber header band with white name text. More assertive and visually distinctive. Body layout identical to Direction A. Best when you want the name to be unmissable at first glance — strong for creative, product, or startup roles.</p>
+  </div>
+  <div class="resume-wrapper">
+    <div class="resume-viewport">
+      <div class="resume-scale">
+        <div data-theme="t-bold-header" data-bold="true"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div style="padding:28px 40px; background:#1a1a1a; border-top:1px solid #333; font-size:11px; color:#444;">
+  Resume Forge · Design Direction Showcase · 2026-05-28 · Open in Chrome for best rendering
+</div>
+
+</body>
+</html>

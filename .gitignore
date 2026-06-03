@@ -1,0 +1,10 @@
+.env
+node_modules/
+bin/
+dist/
+*.tsbuildinfo
+~/.resume-forge/
+.resume-forge/
+
+# Personal data — never commit
+JoshRainboldt/

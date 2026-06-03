@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{name}} — Resume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="resume {{#if compact}}compact{{/if}}">
+
+    <!-- Header (spans both columns) -->
+    <header class="r-header">
+      <div class="r-header-accent"></div>
+      <h1 class="r-name">{{name}}</h1>
+      <p class="r-subtitle">{{subtitle}}</p>
+    </header>
+
+    <!-- Left column: contact + skills -->
+    <aside class="r-left">
+      <section>
+        <h2 class="r-sh">Contact</h2>
+        {{#if contact.phone}}
+        <div class="r-ci"><div class="r-icon">&#9742;</div><span>{{contact.phone}}</span></div>
+        {{/if}}
+        {{#if contact.email}}
+        <div class="r-ci"><div class="r-icon">&#9993;</div><span>{{contact.email}}</span></div>
+        {{/if}}
+        {{#if contact.linkedin}}
+        <div class="r-ci"><div class="r-icon">in</div><span><a href="{{contact.linkedin}}" target="_blank" rel="noopener noreferrer">LinkedIn</a></span></div>
+        {{/if}}
+      </section>
+
+      {{#if skills}}
+      <section>
+        <h2 class="r-sh">Skills</h2>
+        <ul class="r-skills">
+          {{#each skills}}<li>{{this}}</li>{{/each}}
+        </ul>
+      </section>
+      {{/if}}
+
+      {{#if education}}
+      <section>
+        <h2 class="r-sh">Education</h2>
+        {{#each education}}
+        <div class="r-job">
+          <div class="r-jtitle">{{degree}}</div>
+          <div class="r-jmeta">{{institution}} | {{year}}</div>
+        </div>
+        {{/each}}
+      </section>
+      {{/if}}
+    </aside>
+
+    <!-- Right column: summary + experience + achievements -->
+    <main class="r-right">
+      {{#if summary}}
+      <section>
+        <h2 class="r-sh">Summary</h2>
+        <p>{{summary}}</p>
+      </section>
+      {{/if}}
+
+      <section>
+        <h2 class="r-sh">Experience</h2>
+        {{#each experience}}
+        <div class="r-job">
+          <div class="r-jtitle">{{title}} | {{company}}</div>
+          <div class="r-jmeta">{{#if location}}{{location}} | {{/if}}{{startDate}} – {{endDate}}</div>
+          {{#if description}}<p class="r-jdesc">{{description}}</p>{{/if}}
+          {{#if bullets}}
+          <ul class="r-jbullets">
+            {{#each bullets}}<li>{{this}}</li>{{/each}}
+          </ul>
+          {{/if}}
+        </div>
+        {{/each}}
+      </section>
+
+      {{#if achievements}}
+      <section>
+        <h2 class="r-sh">Achievements</h2>
+        <ul class="r-achiev">
+          {{#each achievements}}<li>{{this}}</li>{{/each}}
+        </ul>
+      </section>
+      {{/if}}
+    </main>
+
+  </div>
+</body>
+</html>
