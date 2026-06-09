@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import type { AlignmentResult, ExperiencePool } from '../types.js'
+import type { AlignmentResult, ExperiencePool, GapQuestion } from '../types.js'
 
 // ── Mock LLM adapter ──────────────────────────────────────────────────────────
 const generateGapQuestionMock = vi.fn()
@@ -106,9 +106,16 @@ describe('runGapLoop', () => {
     expect(generateGapQuestionMock).not.toHaveBeenCalled()
   })
 
+  const gapQuestion: GapQuestion = {
+    question: 'Tell me about your Kubernetes experience?',
+    followUp: 'Can you share a specific outcome or scale you achieved?',
+  }
+
   it('calls generateGapQuestion for each unresolved gap', async () => {
-    generateGapQuestionMock.mockResolvedValue('Tell me about your Kubernetes experience?')
-    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue('I deployed 3-node clusters')
+    generateGapQuestionMock.mockResolvedValue(gapQuestion)
+    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue(
+      'I deployed three node clusters and managed scaling policies for the production workloads',
+    )
 
     const updatedResult: AlignmentResult = { ...baseResult, score: 80, gaps: [], gapKeys: [], noMatch: [] }
     analyzeAlignmentMock.mockResolvedValue(updatedResult)
@@ -127,10 +134,17 @@ describe('runGapLoop', () => {
   })
 
   it('collects answers into resolvedGaps', async () => {
-    generateGapQuestionMock.mockResolvedValue('What is your Kubernetes experience?')
+    generateGapQuestionMock.mockResolvedValue({
+      question: 'What is your Kubernetes experience?',
+      followUp: 'Can you share a specific scale or outcome?',
+    } satisfies GapQuestion)
     ;(input as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce('Managed k8s clusters')
-      .mockResolvedValueOnce('Used Terraform at Acme')
+      .mockResolvedValueOnce(
+        'Managed Kubernetes clusters for a three team engineering org handling container scheduling and autoscaling workloads',
+      )
+      .mockResolvedValueOnce(
+        'Used Terraform to provision cloud infrastructure across multiple environments at Acme Corp reducing drift issues',
+      )
 
     const updatedResult: AlignmentResult = { ...baseResult, score: 85, gaps: [], gapKeys: [], noMatch: [] }
     analyzeAlignmentMock.mockResolvedValue(updatedResult)
@@ -140,8 +154,12 @@ describe('runGapLoop', () => {
     stdinHandlers['data']('g')
 
     const result = await promise
-    expect(result.resolvedGaps['kubernetes-orchestration']).toBe('Managed k8s clusters')
-    expect(result.resolvedGaps['terraform']).toBe('Used Terraform at Acme')
+    expect(result.resolvedGaps['kubernetes-orchestration']).toBe(
+      'Managed Kubernetes clusters for a three team engineering org handling container scheduling and autoscaling workloads',
+    )
+    expect(result.resolvedGaps['terraform']).toBe(
+      'Used Terraform to provision cloud infrastructure across multiple environments at Acme Corp reducing drift issues',
+    )
   })
 
   it('skips already-resolved gaps in subsequent rounds', async () => {
@@ -150,8 +168,13 @@ describe('runGapLoop', () => {
       resolvedGaps: { 'kubernetes-orchestration': 'already answered' },
     }
 
-    generateGapQuestionMock.mockResolvedValue('Tell me about Terraform?')
-    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue('Used Terraform at Acme')
+    generateGapQuestionMock.mockResolvedValue({
+      question: 'Tell me about Terraform?',
+      followUp: 'Can you share a specific outcome?',
+    } satisfies GapQuestion)
+    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue(
+      'Used Terraform to provision infrastructure as code across multiple cloud environments at Acme Corp',
+    )
 
     const updatedResult: AlignmentResult = { ...baseResult, score: 80, gaps: [], gapKeys: [], noMatch: [] }
     analyzeAlignmentMock.mockResolvedValue(updatedResult)
@@ -167,10 +190,18 @@ describe('runGapLoop', () => {
   })
 
   it('writes answers to the store', async () => {
-    generateGapQuestionMock.mockResolvedValue('What is your Kubernetes experience?')
+    const q: GapQuestion = {
+      question: 'What is your Kubernetes experience?',
+      followUp: 'Can you share a specific outcome or scale?',
+    }
+    generateGapQuestionMock.mockResolvedValue(q)
     ;(input as ReturnType<typeof vi.fn>)
-      .mockResolvedValueOnce('Managed k8s clusters')
-      .mockResolvedValueOnce('Used Terraform')
+      .mockResolvedValueOnce(
+        'Managed Kubernetes clusters for three engineering teams handling container orchestration autoscaling and deployments across environments',
+      )
+      .mockResolvedValueOnce(
+        'Used Terraform to provision and manage cloud infrastructure as code across multiple environments at Acme Corp',
+      )
 
     const updatedResult: AlignmentResult = { ...baseResult, score: 85, gaps: [], gapKeys: [], noMatch: [] }
     analyzeAlignmentMock.mockResolvedValue(updatedResult)
@@ -182,13 +213,48 @@ describe('runGapLoop', () => {
     await promise
     expect(storeWrite).toHaveBeenCalledWith('kubernetes-orchestration', {
       question: 'What is your Kubernetes experience?',
-      answer: 'Managed k8s clusters',
+      answer: 'Managed Kubernetes clusters for three engineering teams handling container orchestration autoscaling and deployments across environments',
     })
   })
 
+  it('appends follow-up answer when initial answer is fewer than 15 words', async () => {
+    const q: GapQuestion = {
+      question: 'What is your Kubernetes experience?',
+      followUp: 'Can you give a specific example with outcomes?',
+    }
+    generateGapQuestionMock.mockResolvedValue(q)
+
+    const oneGapResultLocal: AlignmentResult = {
+      ...oneGapResult,
+      score: 90,
+      gaps: [],
+      gapKeys: [],
+      noMatch: [],
+    }
+    analyzeAlignmentMock.mockResolvedValue(oneGapResultLocal)
+
+    ;(input as ReturnType<typeof vi.fn>)
+      .mockResolvedValueOnce('Managed k8s clusters')    // short — triggers follow-up
+      .mockResolvedValueOnce('Reduced deploy time by 40 percent across six services')
+
+    const promise = runGapLoop(oneGapSession)
+    await vi.waitFor(() => expect(stdinHandlers['data']).toBeDefined())
+    stdinHandlers['data']('g')
+
+    const result = await promise
+    expect(result.resolvedGaps['kubernetes-orchestration']).toBe(
+      'Managed k8s clusters. Reduced deploy time by 40 percent across six services',
+    )
+  })
+
   it('recalculates alignment after the round and returns updated alignment', async () => {
-    generateGapQuestionMock.mockResolvedValue('Question?')
-    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue('My answer')
+    generateGapQuestionMock.mockResolvedValue({
+      question: 'Question?',
+      followUp: 'Can you be more specific?',
+    } satisfies GapQuestion)
+    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue(
+      'My answer is that I worked extensively on this topic across multiple teams and projects',
+    )
 
     const updatedResult: AlignmentResult = {
       ...baseResult,
@@ -300,8 +366,13 @@ describe('runGapLoop', () => {
 
   it('no stored answer falls through to generateGapQuestion (regression guard)', async () => {
     ;(storeGet as Mock).mockResolvedValue(undefined)
-    generateGapQuestionMock.mockResolvedValue('What is your Kubernetes experience?')
-    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue('Managed k8s clusters')
+    generateGapQuestionMock.mockResolvedValue({
+      question: 'What is your Kubernetes experience?',
+      followUp: 'Can you share a specific outcome?',
+    } satisfies GapQuestion)
+    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue(
+      'Managed Kubernetes clusters for a three team engineering org handling autoscaling and deployments',
+    )
     analyzeAlignmentMock.mockResolvedValue(resolvedAlignment)
 
     const promise = runGapLoop(oneGapSession)
@@ -318,8 +389,13 @@ describe('runGapLoop', () => {
   })
 
   it('exits with code 1 when user presses X', async () => {
-    generateGapQuestionMock.mockResolvedValue('Question?')
-    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue('My answer')
+    generateGapQuestionMock.mockResolvedValue({
+      question: 'Question?',
+      followUp: 'Can you be more specific?',
+    } satisfies GapQuestion)
+    ;(input as ReturnType<typeof vi.fn>).mockResolvedValue(
+      'My answer is extensive experience across several teams and production systems over many years',
+    )
 
     const updatedResult: AlignmentResult = { ...baseResult, score: 70, gaps: [], gapKeys: [], noMatch: [] }
     analyzeAlignmentMock.mockResolvedValue(updatedResult)

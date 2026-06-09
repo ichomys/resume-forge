@@ -39,6 +39,13 @@ export async function runAlignment(
   }
 
   const updatedSession = { ...session, alignment: result }
+
+  if (result.careerChanger) {
+    display.status(
+      'Career transition detected: gap prompting will focus on transferable skills and outcomes relevant to the new domain.',
+    )
+  }
+
   renderAlignmentReport(result)
 
   const key = await readMenuKey()

@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import * as display from '../display.js'
 import { ResumeForgeError, ERROR_CODES } from '../errors.js'
 import type { LLMAdapter } from './adapter.js'
-import type { AlignmentResult, ExperiencePool, ResumeContent } from '../types.js'
+import type { AlignmentResult, ExperiencePool, GapQuestion, ResumeContent } from '../types.js'
 import { alignmentPrompt } from './prompts/alignment.js'
 import { gapQuestionPrompt } from './prompts/gap-question.js'
 import { resumePrompt } from './prompts/resume.js'
@@ -42,9 +42,9 @@ export class AnthropicAdapter implements LLMAdapter {
     gapKey: string,
     description: string,
     pool: ExperiencePool,
-  ): Promise<string> {
+  ): Promise<GapQuestion> {
     const raw = await this.call(gapQuestionPrompt(gapKey, description, pool))
-    return raw.trim()
+    return this.parseJSON<GapQuestion>(raw, 'ALIGNMENT_FAILED')
   }
 
   async generateResume(

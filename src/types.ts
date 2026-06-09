@@ -4,6 +4,12 @@ export type AlignmentResult = {
   gaps: string[]
   noMatch: string[]
   gapKeys: string[]
+  careerChanger?: boolean
+}
+
+export type GapQuestion = {
+  question: string
+  followUp: string
 }
 
 export type ExperienceEntry = {

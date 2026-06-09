@@ -1,4 +1,4 @@
-import type { AlignmentResult, ExperiencePool, ResumeContent } from '../types.js'
+import type { AlignmentResult, ExperiencePool, GapQuestion, ResumeContent } from '../types.js'
 
 /**
  * Thin LLM abstraction. All business logic depends on this interface, never on a
@@ -14,7 +14,7 @@ export interface LLMAdapter {
     gapKey: string,
     description: string,
     pool: ExperiencePool,
-  ): Promise<string>
+  ): Promise<GapQuestion>
   generateResume(
     analysis: AlignmentResult,
     pool: ExperiencePool,

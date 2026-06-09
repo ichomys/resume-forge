@@ -31,7 +31,7 @@ Return this exact JSON structure matching ResumeContent:
   "name": "<full name>",
   "subtitle": "<role title>",
   "contact": {},
-  "summary": "<2-3 sentence summary>",
+  "summary": "<2-3 sentence summary tying the candidate's strongest aligned areas to the target role>",
   "experience": [
     {
       "title": "<title>",
@@ -48,7 +48,10 @@ Return this exact JSON structure matching ResumeContent:
   "achievements": ["<achievement>"]
 }
 
-Rules:
+Non-negotiable rules (enforce strictly):
+- NEVER invent or estimate a metric the candidate did not explicitly state. Use numbers only from ADDITIONAL CONTEXT PROVIDED (user-confirmed in session) or verbatim from CANDIDATE EXPERIENCE entries. If no metric exists, describe the action and outcome qualitatively — omit the number rather than estimate it.
+- Frame achievement bullets in STAR structure where evidence supports it: specific situation or context → concrete action → result. Keep bullets concise (one sentence). If a result cannot be stated without inventing a number, describe the outcome qualitatively.
+- Only include defensible claims: if a bullet relies on an unconfirmed or vague claim, soften or omit it — do not promote unverified assertions to the top of a bullet list.
 - Order experience by relevance to the role (most aligned first)
 - Frame bullets around the ROLE REQUIREMENTS listed above
 - Omit optional fields (achievements, summary) if not applicable — do not write null or empty strings`

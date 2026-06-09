@@ -5,7 +5,7 @@ import { getExperiencePool } from '../profile/index.js'
 import * as display from '../display.js'
 import { write as storeWrite, get as storeGet, update as storeUpdate } from '../store/index.js'
 import { renderAlignmentReport } from './alignment.js'
-import type { AlignmentResult, GenerationSession } from '../types.js'
+import type { AlignmentResult, GapQuestion, GenerationSession } from '../types.js'
 
 /** Gap discovery loop — question generation, multi-round context collection, recalculation, fit assessment. */
 export async function runGapLoop(session: GenerationSession): Promise<GenerationSession> {
@@ -76,28 +76,39 @@ export async function runGapLoop(session: GenerationSession): Promise<Generation
         continue
       }
 
-      // LLM call 2: generate a human-phrased question for this gap
+      // LLM call 2: generate interview-style question with follow-up probe
       const spin = display.spinner(`Generating question for gap ${gapNum} of ${totalGaps}...`)
-      let question: string
+      let gapQuestion: GapQuestion
       try {
-        question = await llm.generateGapQuestion(gapKey, gapDescription, pool)
+        gapQuestion = await llm.generateGapQuestion(gapKey, gapDescription, pool)
         spin.succeed()
       } catch (e) {
         spin.fail()
         throw e
       }
 
-      // Display gap prompt (Story 3.2 AC3)
+      // Display primary question
       console.log()
       display.prompt(`Gap ${gapNum} of ${totalGaps} — ${gapKey}`)
       console.log()
-      console.log(question)
+      console.log(gapQuestion.question)
 
       const answer = await input({ message: '>' })
+      let finalAnswer = answer.trim()
 
-      if (answer.trim()) {
-        await storeWrite(gapKey, { question, answer: answer.trim() })
-        resolvedGaps = { ...resolvedGaps, [gapKey]: answer.trim() }
+      // Follow-up probe when initial answer is too short to surface real evidence (< 15 words)
+      if (finalAnswer && finalAnswer.split(/\s+/).length < 15) {
+        console.log()
+        console.log(gapQuestion.followUp)
+        const followUpAnswer = await input({ message: '>' })
+        if (followUpAnswer.trim()) {
+          finalAnswer = `${finalAnswer}. ${followUpAnswer.trim()}`
+        }
+      }
+
+      if (finalAnswer) {
+        await storeWrite(gapKey, { question: gapQuestion.question, answer: finalAnswer })
+        resolvedGaps = { ...resolvedGaps, [gapKey]: finalAnswer }
       }
     }
 
@@ -122,6 +133,13 @@ export async function runGapLoop(session: GenerationSession): Promise<Generation
 
     // Show alignment delta (Story 3.4 AC2)
     display.status(`Alignment updated: ${prevScore}% → ${currentAlignment.score}%`)
+
+    // Surface career transition warning so the user understands why gaps may be harder to close
+    if (currentAlignment.careerChanger) {
+      display.status(
+        'Career transition detected: focus your answers on transferable skills and concrete outcomes that map to the new domain.',
+      )
+    }
 
     // Story 3.5: Show fit assessment when unresolvable gaps remain
     const hasNoMatch = currentAlignment.noMatch.length > 0
